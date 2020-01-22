@@ -1,7 +1,19 @@
 <template>
 	<div>
-		<BookableListItem title="Cheap Villa" content="content prop" v-bind:price="1000"></BookableListItem>	
-		<BookableListItem title="Cheap Villa 2" content="content prop 2" v-bind:price="1200"></BookableListItem>	
+		Number of Rows are: {{ rows }}
+		<div v-if="loading">
+			Data is loading...
+		</div>
+		<div v-else>
+			<div class="row mb-4" v-for="row in rows" :key="'row' + row">
+				<div class="col" v-for="(bookable, column) in bookablesInRow(row)" :key="'row' + row + column">
+					<BookableListItem v-bind:item-title="bookable.title" v-bind:item-content="bookable.content" v-bind:price="1000"></BookableListItem>
+				</div>
+				<div class="col" v-for="p in placeholdersInRow(row)" :key="'placeholder' + row + p"></div>
+			</div>
+	
+		</div>
+		
 	</div>
 </template>
 
@@ -12,23 +24,56 @@
 		components: {
 			BookableListItem
 		},
-		// beforeCreate() {
-		// 	console.log('before create');
-		// },
+		data() {
+			return {
+				bookables: null,
+				loading: false,
+				columns: 3
+			};
+		},
+		computed: {
+			rows() {
+				return this.bookables === null ? 0 : Math.ceil(this.bookables.length / this.columns);
+			}
+		},
+		methods: {
+			bookablesInRow(row) {
+				return this.bookables.slice((row - 1) * this.columns, row * this.columns);
+			},
+			placeholdersInRow(row) {
+				return this.columns - this.bookablesInRow(row).length;
+			}
+		},
 		created() {
-			console.log('created');
-		},
-		// beforeMount() {
-		// 	console.log('before mount');
-		// },
-		mounted() {
-			console.log('mounted');
-		},
-		// beforeDestroy() {
-		// 	console.log('before destroy');
-		// },
-		// destroyed() {
-		// 	console.log('destroyed');
-		// },	
-	}
+
+			this.loading = true;
+
+			setTimeout(() => {
+				this.bookables = [
+				{
+					id: 1,
+					title: "Cheap Villa 1",
+					content: "Cheap Villa content 1"
+				},
+				{
+					title: "Cheap Villa 2",
+					content: "Cheap Villa content 2"
+				},
+				{
+					title: "Cheap Villa 3",
+					content: "Cheap Villa content 3"
+				},
+				{
+					title: "Cheap Villa 4",
+					content: "Cheap Villa content 4"
+				},
+				{
+					title: "Cheap Villa 5",
+					content: "Cheap Villa content 5"
+				}
+				];
+				this.loading = false;
+			}, 2000);
+		}	
+	};
 </script>
