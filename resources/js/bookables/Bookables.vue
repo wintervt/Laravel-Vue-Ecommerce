@@ -6,8 +6,8 @@
 		</div>
 		<div v-else>
 			<div class="row mb-4" v-for="row in rows" :key="'row' + row">
-				<div class="col" v-for="(bookable, column) in bookablesInRow(row)" :key="'row' + row + column">
-					<BookableListItem v-bind:item-title="bookable.title" v-bind:item-content="bookable.content" v-bind:price="1000"></BookableListItem>
+				<div class="col d-flex align-items-strech" v-for="(bookable, column) in bookablesInRow(row)" :key="'row' + row + column">
+					<BookableListItem v-bind="bookable"></BookableListItem>
 				</div>
 				<div class="col" v-for="p in placeholdersInRow(row)" :key="'placeholder' + row + p"></div>
 			</div>
@@ -48,32 +48,19 @@
 
 			this.loading = true;
 
-			setTimeout(() => {
-				this.bookables = [
-				{
-					id: 1,
-					title: "Cheap Villa 1",
-					content: "Cheap Villa content 1"
-				},
-				{
-					title: "Cheap Villa 2",
-					content: "Cheap Villa content 2"
-				},
-				{
-					title: "Cheap Villa 3",
-					content: "Cheap Villa content 3"
-				},
-				{
-					title: "Cheap Villa 4",
-					content: "Cheap Villa content 4"
-				},
-				{
-					title: "Cheap Villa 5",
-					content: "Cheap Villa content 5"
-				}
-				];
-				this.loading = false;
-			}, 2000);
+			// const p = new Promise((resolve, reject) => {
+			// 	console.log(resolve);
+			// 	console.log(reject);
+
+			// 	setTimeout(() => resolve("Hello"), 3000);
+
+			// }).then(result => console.log(`Success ${result}`))
+			// .catch(result => console.log(`Error ${result}`));
+
+			const request = axios.get("/api/bookables").then(response => {
+			 this.bookables = response.data;
+			 this.loading = false; 
+			});
 		}	
 	};
 </script>
