@@ -10,7 +10,9 @@
 
 				<div class="row pt-3">	
 					<div class="col-md-6">Milan Toth</div>
-					<div class="col-md-6 d-flex justify-content-end">{{ review.rating }}</div>
+					<div class="col-md-6 d-flex justify-content-end">
+						<star-rating :rating="review.rating" class="fa-lg"></star-rating>
+					</div>
 				</div>
 
 				<div class="row">	
@@ -32,7 +34,7 @@
 
 
 <script>
-	import moment from "moment";
+	// import moment from "moment";
 
 	export default {
 		props: {
@@ -50,10 +52,10 @@
 			.then(response => this.reviews = response.data.data)
 			.then(() => (this.loading = false));
 		},
-		filters : {
-			fromNow(value) {
-				return moment(value).fromNow();
-			}
-		}
+		// filters : {
+		// 	fromNow(value) {
+		// 		return moment(value).fromNow();
+		// 	}
+		// }
 	}
 </script>
