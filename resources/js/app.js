@@ -30,7 +30,11 @@ const store = new Vuex.Store(storeDefinition);
 const app = new Vue({
     el: '#app',
     router,
+    store,
     components: {
     	index: Index,
-    }
+    },
+    beforeCreate() {
+    	this.$store.dispatch("loadStoredState");
+    },
 });

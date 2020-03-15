@@ -1,8 +1,10 @@
 <template>
 	<div>
 		<h6 class="text-uppercase text-secondary font-weight-bolder">Check Availability
-		<span v-if="noAvailability" class="text-danger">(NOT AVAILABLE)</span>
-		<span v-if="hasAvailability" class="text-success">(AVAILABLE)</span>
+			<transition name="fade">
+				<span v-if="noAvailability" class="text-danger">(NOT AVAILABLE)</span>
+				<span v-if="hasAvailability" class="text-success">(AVAILABLE)</span>
+			</transition>
 		</h6>
 
 		<div class="form-row">
@@ -17,7 +19,10 @@
 				<v-errors :errors="errorFor('to')"></v-errors>
 			</div>
 		</div>
-		<button v-on:click="check" v-bind:disabled="loading" class="btn btn-secondary btn-block">Check</button>
+		<button v-on:click="check" v-bind:disabled="loading" class="btn btn-secondary btn-block">
+			<span v-if="!loading">Check</span>
+			<span v-if="loading"><i class="fas fa-circle-noth fa-spin"></i> Checking...</span>
+		</button>
 	</div>
 </template>
 
@@ -39,25 +44,31 @@
 			};
 		},
 		methods: {
-		check() {
+		async check() {
 			this.loading = true;
 			this.errors = null;
 
-			this.$store.commit('setLastSearch', {
+			this.$store.dispatch('setLastSearch', {
 				from: this.from,
 				to: this.to
 			});
+
+			try {
+				this.status = (await axios.get(
+					`/api/bookables/${this.bookableId}/availability?from=${this.from}&to=${this.to}`
+					)).status;
+				this.$emit("availability", this.hasAvailability);
+			} catch(error) {
+				if (is422(error)) {
+					this.errors = error.response.data.errors;
+				}
+				this.status = error.response.status;
+				this.$emit("availability", this.hasAvailability);
+			}
+
+			this.loading = false;
 			
-			axios.get(`/api/bookables/${this.bookableId}/availability?from=${this.from}&to=${this.to}`
-				).then(response => {
-					this.status = response.status;
-				}).catch(error => {
-					if (is422(error)) {
-						this.errors = error.response.data.errors;
-					}
-					this.status = error.response.status;
-				}).then(() => (this.loading = false));
-		 },
+		 }
 		},
 		computed: {
 			hasErrors() {
